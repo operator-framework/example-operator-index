@@ -21,20 +21,29 @@ catalog: $(OPERATOR_CATALOG_CONTRIBUTION)
 # here are a few examples of different approaches to fulfilling this target
 # comment out / customize the one that makes the most sense, or use them as examples in defining your own
 #
-# --- BASIC VENEER ---
+# --- BASIC TEMPLATE ---
 #catalog: basic framework
 #
-# --- SEMVER VENEER ---
+# --- SEMVER TEMPLATE ---
 #catalog: semver framework
 #
-#  --- COMPOUND VENEER ---
-#  this case is for when a single veneer cannot support the use-case, and automated changes to the generated FBC need to be made before it is complete
+# --- COMPOSITE TEMPLATE ---
+# composite target processes a composite template to generate the FBC contributions
+# `render-template composite` has `--validate` option enabled by default, 
+# so no subsequent validation is required
+.PHONY: composite
+composite: bin/opm
+	bin/opm alpha render-template composite -f catalogs.yaml -c contributions.yaml
+
+#
+#  --- COMPOUND TEMPLATE ---
+#  this case is for when a single template cannot support the use-case, and automated changes to the generated FBC need to be made before it is complete
 #  this example models the need to set the v0.2.1 of the operator with the `olm.deprecated` property, to prevent installation
 #
 #catalog: $(YQ) semver framework
 #	$(YQ) eval 'select(.name == "testoperator.v0.2.1" and .schema == "olm.bundle").properties += [{"type" : "olm.deprecated", "value" : "true"}]' -i  $(OPERATOR_CATALOG_CONTRIBUTION)
 
-# framework target provides two pieces that are helpful for any veneer approach:  
+# framework target provides two pieces that are helpful for any template approach:  
 #  - an OWNERS file to provide default contribution control
 #  - an .indexignore file to illustrate how to add content to the FBC contribution which should be 
 #    excluded from validation via `opm validate`
@@ -44,20 +53,20 @@ framework: CATALOG_OWNERS
          echo "OWNERS" > $(OPERATOR_CATALOG_DIR)/.indexignore
 
 
-# basic target provides an example FBC generation from a `basic` veneer type.  
+# basic target provides an example FBC generation from a `basic` template type.  
 # this example takes a single file as input and generates a well-formed FBC operator contribution as an output
 # the 'validate' target should be used next to validate the output
 .PHONY: basic
-basic: bin/opm basic-veneer.yaml clean
-	mkdir -p $(OPERATOR_CATALOG_DIR) && bin/opm alpha render-veneer basic -o yaml basic-veneer.yaml > $(OPERATOR_CATALOG_CONTRIBUTION)
+basic: bin/opm basic-template.yaml clean
+	mkdir -p $(OPERATOR_CATALOG_DIR) && bin/opm alpha render-template basic -o yaml basic-template.yaml > $(OPERATOR_CATALOG_CONTRIBUTION)
 
 
-# semver target provides an example FBC generation from a `semver` veneer type.  
+# semver target provides an example FBC generation from a `semver` template type.  
 # this example takes a single file as input and generates a well-formed FBC operator contribution as an output
 # the 'validate' target should be used next to validate the output
 .PHONY: semver
-semver: bin/opm semver-veneer.yaml clean
-	mkdir -p $(OPERATOR_CATALOG_DIR) && bin/opm alpha render-veneer semver -o yaml semver-veneer.yaml > $(OPERATOR_CATALOG_CONTRIBUTION)
+semver: bin/opm semver-template.yaml clean
+	mkdir -p $(OPERATOR_CATALOG_DIR) && bin/opm alpha render-template semver -o yaml semver-template.yaml > $(OPERATOR_CATALOG_CONTRIBUTION)
 
 
 # validate target illustrates FBC validation
@@ -68,7 +77,7 @@ validate: bin/opm $(OPERATOR_CATALOG_CONTRIBUTION) preverify
 
 
 # preverify target ensures that the operator name is consistent between the destination directory and the generated catalog
-# since the veneer will be modified outside the build process but needs to be consistent with the directory name
+# since the template will be modified outside the build process but needs to be consistent with the directory name
 .PHONY: preverify
 preverify: $(YQ) $(OPERATOR_CATALOG_CONTRIBUTION)
 	./validate.sh -n $(OPERATOR_NAME) -f $(OPERATOR_CATALOG_CONTRIBUTION)
@@ -81,7 +90,7 @@ clean:
 
 OS=$(shell uname -s | tr '[:upper:]' '[:lower:]')
 ARCH=$(shell uname -m | sed 's/x86_64/amd64/')
-OPM_VERSION ?= v1.26.1
+OPM_VERSION ?= v1.36.0
 bin/opm:
 	mkdir -p bin
 	curl -sLO https://github.com/operator-framework/operator-registry/releases/download/$(OPM_VERSION)/$(OS)-$(ARCH)-opm && chmod +x $(OS)-$(ARCH)-opm && mv $(OS)-$(ARCH)-opm bin/opm
