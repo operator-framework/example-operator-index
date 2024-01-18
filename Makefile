@@ -21,13 +21,22 @@ catalog: $(OPERATOR_CATALOG_CONTRIBUTION)
 # here are a few examples of different approaches to fulfilling this target
 # comment out / customize the one that makes the most sense, or use them as examples in defining your own
 #
-# --- BASIC VENEER ---
+# --- BASIC TEMPLATE ---
 #catalog: basic framework
 #
-# --- SEMVER VENEER ---
+# --- SEMVER TEMPLATE ---
 #catalog: semver framework
 #
-#  --- COMPOUND VENEER ---
+# --- COMPOSITE TEMPLATE ---
+# composite target processes a composite template to generate the FBC contributions
+# `render-template composite` has `--validate` option enabled by default, 
+# so no subsequent validation is required
+.PHONY: composite
+composite: bin/opm
+	bin/opm alpha render-template composite -f catalogs.yaml -c contributions.yaml
+
+#
+#  --- COMPOUND TEMPLATE ---
 #  this case is for when a single template cannot support the use-case, and automated changes to the generated FBC need to be made before it is complete
 #  this example models the need to set the v0.2.1 of the operator with the `olm.deprecated` property, to prevent installation
 #
@@ -81,7 +90,7 @@ clean:
 
 OS=$(shell uname -s | tr '[:upper:]' '[:lower:]')
 ARCH=$(shell uname -m | sed 's/x86_64/amd64/')
-OPM_VERSION ?= v1.26.1
+OPM_VERSION ?= v1.36.0
 bin/opm:
 	mkdir -p bin
 	curl -sLO https://github.com/operator-framework/operator-registry/releases/download/$(OPM_VERSION)/$(OS)-$(ARCH)-opm && chmod +x $(OS)-$(ARCH)-opm && mv $(OS)-$(ARCH)-opm bin/opm

@@ -1,0 +1,32 @@
+schema: olm.composite
+components:
+  - name: example-basic-catalog
+    destination:
+      path: testoperator
+    strategy:
+      name: basic
+      template:
+        schema: olm.builder.basic
+        config:
+          input: basic-template.yaml
+          output: catalog.yaml
+  - name: example-semver-catalog
+    destination:
+      path: testoperator
+    strategy:
+      name: semver
+      template:
+        schema: olm.builder.semver
+        config:
+          input: semver-template.yaml
+          output: catalog.yaml
+  - name: another-example-semver-catalog
+    destination:
+      path: testoperator
+    strategy:
+      name: semver
+      template:
+        schema: olm.builder.semver
+        config:
+          input: semver-template.yaml
+          output: catalog.yaml
