@@ -27,15 +27,6 @@ catalog: $(OPERATOR_CATALOG_CONTRIBUTION)
 # --- SEMVER TEMPLATE ---
 #catalog: semver framework
 #
-# --- COMPOSITE TEMPLATE ---
-# composite target processes a composite template to generate the FBC contributions
-# `render-template composite` has `--validate` option enabled by default, 
-# so no subsequent validation is required
-.PHONY: composite
-composite: bin/opm
-	bin/opm alpha render-template composite -f catalogs.yaml -c contributions.yaml
-
-#
 #  --- COMPOUND TEMPLATE ---
 #  this case is for when a single template cannot support the use-case, and automated changes to the generated FBC need to be made before it is complete
 #  this example models the need to set the v0.2.1 of the operator with the `olm.deprecated` property, to prevent installation
