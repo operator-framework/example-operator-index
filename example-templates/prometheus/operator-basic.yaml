@@ -1,0 +1,18 @@
+---
+entries:
+- defaultChannel: alpha
+  name: prometheus
+  schema: olm.package
+- entries:
+  - name: prometheus-operator.v0.14.0
+  - name: prometheus-operator.v0.15.0
+    replaces: prometheus-operator.v0.14.0
+  name: alpha
+  package: prometheus
+  schema: olm.channel
+- image: quay.io/operator-framework/operator-bundle-prometheus:0.14.0
+  schema: olm.bundle
+- image: quay.io/operator-framework/operator-bundle-prometheus:0.15.0
+  schema: olm.bundle
+schema: olm.template.basic
+

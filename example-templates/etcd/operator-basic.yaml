@@ -1,0 +1,20 @@
+---
+entries:
+- entries:
+  - defaultChannel: alpha
+    name: etcd
+    schema: olm.package
+  - image: docker.io/anik120/etcd:latest
+    schema: olm.bundle
+  - image: docker.io/anik120/etcd:v0.9.4
+    schema: olm.bundle
+  - entries:
+    - name: etcdoperator-community.v0.6.1
+    - name: etcdoperator-community.v0.9.4
+      replaces: etcdoperator-community.v0.6.1
+    name: alpha
+    package: etcd
+    schema: olm.channel
+  schema: olm.template.basic
+schema: olm.template.basic
+
